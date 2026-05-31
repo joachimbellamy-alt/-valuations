@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Import Firebase</title>
+</head>
+<body>
+  <h2>Import en cours...</h2>
+  <div id="log" style="font-family:monospace;font-size:13px;"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBoYst-1Hg1I5TBRZ9kn0emKQWltQHwfzo",
+      authDomain: "evaluations-college.firebaseapp.com",
+      projectId: "evaluations-college",
+      storageBucket: "evaluations-college.firebasestorage.app",
+      messagingSenderId: "507635245834",
+      appId: "1:507635245834:web:a71876dca641b71e6390f3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const log = document.getElementById('log');
+
+    const eleves = {
+      "1": { "nom": "Lyne", "note": 7, "competence": "satisf", "proc": { "val": 2, "texte": "Les procédés rhétoriques (anaphores, contrastes, changements d'énonciation) sont rendus audibles et témoignent d'une cohérence avec le travail préparatoire." }, "volume": { "val": 2, "texte": "le volume est adéquate : il permet d'être compris sans difficulté et témoigne d'une intention de sens." }, "debit": { "val": 1, "texte": "Le débit est uniforme, sans variations rythmiques pour mettre en valeur le texte." }, "fluidite": { "val": 1, "texte": "La fluidité est présente mais des hésitations persistent et nuisent à l'écoute." }, "ponctuation": { "val": 2, "texte": "Les pauses respiratoires et les silences respectent bien le sens du discours." } },
+      "2": { "nom": "Allya", "note": 6.5, "competence": "satisf", "proc": { "val": 2, "texte": "Les procédés rhétoriques (anaphores, contrastes, changements d'énonciation) sont rendus audibles et témoignent d'une cohérence avec le travail préparatoire." }, "volume": { "val": 2, "texte": "le volume est adéquate : il permet d'être compris sans difficulté et témoigne d'une intention de sens." }, "debit": { "val": 1, "texte": "Le débit est uniforme, sans variations rythmiques pour mettre en valeur le texte." }, "fluidite": { "val": 2, "texte": "La lecture est fluide et soutient l'écoute." }, "ponctuation": { "val": 1, "texte": "La ponctuation est parfois respectée, mais des hésitations ou erreurs subsistent." } },
+      "3": { "nom": "Tya et Aziliz", "note": 8, "competence": null, "proc": { "val": 2, "texte": "Les procédés rhétoriques (anaphores, contrastes, changements d'énonciation) sont rendus audibles et témoignent d'une cohérence avec le travail préparatoire." }, "volume": { "val": 2, "texte": "le volume est adéquate : il permet d'être compris sans difficulté et témoigne d'une intention de sens." }, "debit": { "val": 2, "texte": "Le rythme est maîtrisé : le débit est posé, l'articulation précise et la vitesse marque une intention de sens." }, "fluidite": { "val": 2, "texte": "La lecture est fluide et soutient l'écoute." }, "ponctuation": { "val": 2, "texte": "Les pauses respiratoires et les silences respectent bien le sens du discours." } },
+      "4": { "nom": "Clara", "note": 8, "competence": null, "proc": { "val": 2, "texte": "Les procédés rhétoriques (anaphores, contrastes, changements d'énonciation) sont rendus audibles et témoignent d'une cohérence avec le travail préparatoire." }, "volume": { "val": 2, "texte": "le volume est adéquate : il permet d'être compris sans difficulté et témoigne d'une intention de sens." }, "debit": { "val": 2, "texte": "Le rythme est maîtrisé : le débit est posé, l'articulation précise et la vitesse marque une intention de sens." }, "fluidite": { "val": 3, "texte": "La voix est fluide et s'adapte avec souplesse aux inflexions du texte." }, "ponctuation": { "val": 2, "texte": "Les pauses respiratoires et les silences respectent bien le sens du discours." } },
+      "5": { "nom": "Océane", "note": 7, "competence": null, "proc": { "val": 2, "texte": "Les procédés rhétoriques (anaphores, contrastes, changements d'énonciation) sont rendus audibles et témoignent d'une cohérence avec le travail préparatoire." }, "volume": { "val": 2, "texte": "le volume est adéquate : il permet d'être compris sans difficulté et témoigne d'une intention de sens." }, "debit": { "val": 2, "texte": "Le rythme est maîtrisé : le débit est posé, l'articulation précise et la vitesse marque une intention de sens." }, "fluidite": { "val": 1, "texte": "La fluidité est présente mais des hésitations persistent et nuisent à l'écoute." }, "ponctuation": { "val": 2, "texte": "Les pauses respiratoires et les silences respectent bien le sens du discours." } },
+      "6": { "nom": "Sterenn", "note": 6.5, "competence": null, "proc": { "val": 1, "texte": "Certains procédés d'écriture sont rendus audibles, mais de manière inégale ou incomplète." }, "volume": { "val": 2, "texte": "le volume est adéquate : il permet d'être compris sans difficulté et témoigne d'une intention de sens." }, "debit": { "val": 2, "texte": "Le rythme est maîtrisé : le débit est posé, l'articulation précise et la vitesse marque une intention de sens." }, "fluidite": { "val": 2, "texte": "La lecture est fluide et soutient l'écoute." }, "ponctuation": { "val": 2, "texte": "Les pauses respiratoires et les silences respectent bien le sens du discours." } }
+    };
+
+    async function importer() {
+      for (const [ordre, d] of Object.entries(eleves)) {
+        const id = Date.now() + parseInt(ordre) * 10;
+        const synthese = ['proc','volume','debit','fluidite','ponctuation']
+          .map(k => d[k].texte).join(" ");
+        const criteres = {};
+        for (const k of ['proc','volume','debit','fluidite','ponctuation']) {
+          criteres[k] = { val: d[k].val, texte: d[k].texte };
+        }
+        await setDoc(doc(db, "eleves", String(id)), {
+          id,
+          ordre: parseInt(ordre),
+          nom: d.nom,
+          note: d.note,
+          competence: d.competence,
+          synthese,
+          criteres,
+          updatedAt: new Date().toISOString()
+        });
+        log.innerHTML += `✓ ${d.nom} importé<br>`;
+      }
+      log.innerHTML += '<br><strong>✅ Import terminé ! Vous pouvez fermer cette page.</strong>';
+    }
+
+    importer();
+  </script>
+</body>
+</html>
